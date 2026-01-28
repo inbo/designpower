@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: "designpower: Design Power Analysis Tools"
+authors:
+- given-names: Thierry
+  family-names: Onkelinx
+  affiliation: Research Institute for Nature and Forest (INBO)
+  orcid: 0000-0001-8804-4216
+keywords:
+- sample size, power analysis, design optimization
+contact:
+- given-names: Thierry
+  family-names: Onkelinx
+  affiliation: Research Institute for Nature and Forest (INBO)
+  orcid: 0000-0001-8804-4216
+doi: ~
+license: GPL-3.0
+repository-code: https://github.com/inbo/designpower/
+type: software
+abstract: "Tools for iterative power analysis and design optimization using simulation
+  and adaptive sampling strategies."
+version: 0.0.1

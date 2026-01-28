@@ -1,0 +1,36 @@
+{
+  "title": "designpower: Design Power Analysis Tools",
+  "version": "0.0.1",
+  "license": "GPL-3.0",
+  "upload_type": "software",
+  "description": "<p>Tools for iterative power analysis and design optimization using simulation and adaptive sampling strategies.<\/p>",
+  "keywords": [
+    "sample size, power analysis, design optimization"
+  ],
+  "access_right": "open",
+  "language": "eng",
+  "contributors": [
+    {
+      "name": "Onkelinx, Thierry",
+      "affiliation": "Research Institute for Nature and Forest (INBO)",
+      "orcid": "0000-0001-8804-4216",
+      "type": "contactperson"
+    },
+    {
+      "name": "Research Institute for Nature and Forest (INBO)",
+      "type": "rightsholder"
+    }
+  ],
+  "creators": [
+    {
+      "name": "Onkelinx, Thierry",
+      "affiliation": "Research Institute for Nature and Forest (INBO)",
+      "orcid": "0000-0001-8804-4216"
+    }
+  ],
+  "communities": [
+    {
+      "identifier": "inbo"
+    }
+  ]
+}
