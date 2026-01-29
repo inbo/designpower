@@ -2,12 +2,12 @@ citHeader("To cite `designpower` in publications please use:")
 # begin checklist entry
 bibentry(
   bibtype = "Manual",
-  title = "designpower: Design Power Analysis Tools. Version 0.0.1",
+  title = "designpower: Design Power Analysis Tools. Version 0.0.2",
   author = c(person(given = "Thierry", family = "Onkelinx")),
   year = 2026,
   url = "https://github.com/inbo/designpower/",
   abstract = "Tools for iterative power analysis and design optimization using simulation and adaptive sampling strategies.",
-  textVersion = "Onkelinx, Thierry (2026) designpower: Design Power Analysis Tools. Version 0.0.1. https://github.com/inbo/designpower/",
+  textVersion = "Onkelinx, Thierry (2026) designpower: Design Power Analysis Tools. Version 0.0.2. https://github.com/inbo/designpower/",
   keywords = "sample size, power analysis, design optimization",
 )
 # end checklist entry

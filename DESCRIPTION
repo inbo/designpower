@@ -1,6 +1,6 @@
 Package: designpower
 Title: Design Power Analysis Tools
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
     person("Thierry", "Onkelinx", , "thierry.onkelinx@inbo.be", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8804-4216", affiliation = "Research Institute for Nature and Forest (INBO)")),
