@@ -69,6 +69,20 @@ sample_new_design <- function(
     flush.console()
     return(new_design)
   }
+  if (nrow(power_summary) <= 2) {
+    c(
+      power_summary[power_summary$ucl < power, opti],
+      power_summary[power_summary$lcl > power, opti]
+    ) |>
+      mean() |>
+      round(digits = design_digits[opti]) -> new_design
+    p <- p +
+      geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +
+      ggtitle(sprintf("next try: %s = %s", opti, as.character(new_design)))
+    print(p)
+    flush.console()
+    return(new_design)
+  }
   power_summary$non_signif <- pmax(power_summary$non_signif, 1)
   power_summary$signif <- pmax(power_summary$signif, 1)
   sprintf("cbind(signif, non_signif) ~ s(%s, bs = \"cs\", k = 3)", opti) |>
