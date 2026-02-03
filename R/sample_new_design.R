@@ -12,7 +12,7 @@
 #' @return Numeric. The next design parameter value to test, or empty vector if
 #'   converged to target power.
 #'
-#' @importFrom dplyr across filter lag lead left_join mutate select slice_sample
+#' @importFrom dplyr across filter first lag last lead left_join mutate select slice_sample
 #' @importFrom ggplot2 aes geom_errorbar geom_hline geom_line geom_point
 #' geom_rect geom_ribbon geom_vline ggplot ggtitle scale_y_continuous
 #' @importFrom mgcv gam
@@ -42,10 +42,24 @@ sample_new_design <- function(
     geom_point(aes(y = .data$estimated_power)) +
     scale_y_continuous("Estimated power", limits = c(0, 1), labels = percent)
   if (0.5 < min(power_summary$ucl)) {
-    power_summary[, opti] |>
-      abs() |>
-      min() -> current_min
-    round(current_min / 2, digits = design_digits[opti]) |>
+    if (abs(min(power_summary$estimate) - 1) < 1e-9) {
+      decrease <- sample(c(TRUE, FALSE), 1)
+    } else {
+      decrease <- power_summary[which.min(power_summary$estimate), opti] <
+        power_summary[which.max(power_summary$estimate), opti]
+    }
+    if (decrease) {
+      power_summary[, opti] |>
+        abs() |>
+        min() -> current
+      current <- current / 2
+    } else {
+      power_summary[, opti] |>
+        abs() |>
+        max() -> current
+      current <- current * 2
+    }
+    round(current, digits = design_digits[opti]) |>
       max(10^-design_digits[opti]) -> new_design
     new_design * sign(design[[opti]]) -> new_design
     p <- p +
@@ -56,10 +70,24 @@ sample_new_design <- function(
     return(new_design)
   }
   if (max(power_summary$lcl) < power) {
-    power_summary[, opti] |>
-      abs() |>
-      max() -> current_max
-    round(current_max * 2, digits = design_digits[opti]) |>
+    if (min(power_summary$estimate) < 1e-9) {
+      decrease <- sample(c(TRUE, FALSE), 1)
+    } else {
+      decrease <- power_summary[which.min(power_summary$estimate), opti] <
+        power_summary[which.max(power_summary$estimate), opti]
+    }
+    if (decrease) {
+      power_summary[, opti] |>
+        abs() |>
+        max() -> current
+      current <- current * 2
+    } else {
+      power_summary[, opti] |>
+        abs() |>
+        min() -> current
+      current <- current / 2
+    }
+    round(current, digits = design_digits[opti]) |>
       max(10^-design_digits[opti]) -> new_design
     new_design * sign(design[[opti]]) -> new_design
     p <- p +
@@ -117,8 +145,8 @@ sample_new_design <- function(
     ) -> predict_data
   predict_data |>
     filter(
-      lag(.data$lcl, 1, min(.data$lcl)) < power,
-      lead(.data$ucl, 1, max(.data$ucl)) >= power,
+      lag(.data$lcl, 1, first(.data$lcl)) < power,
+      lead(.data$ucl, 1, last(.data$ucl)) >= power,
       .data$n_sim < 1000
     ) -> candidate
   while (nrow(candidate) >= 50) {
@@ -132,12 +160,21 @@ sample_new_design <- function(
   candidate |>
     slice_sample(n = 1, weight_by = 1000 - .data$n_sim) -> new_design
   new_design <- unlist(new_design[[opti]])
-  sign(design[[opti]]) *
-    c(
-      min(abs(predict_data[power < predict_data$lcl, opti])),
-      min(abs(predict_data[power < predict_data$ucl, opti]))
-    ) |>
-      range() -> attr(new_design, "range")
+  if (head(predict_data$fit, 1) < tail(predict_data$fit, 1)) {
+    sign(design[[opti]]) *
+      c(
+        min(abs(predict_data[power < predict_data$lcl, opti])),
+        min(abs(predict_data[power < predict_data$ucl, opti]))
+      ) |>
+        range() -> attr(new_design, "range")
+  } else {
+    sign(design[[opti]]) *
+      c(
+        max(abs(predict_data[power < predict_data$lcl, opti])),
+        max(abs(predict_data[power < predict_data$ucl, opti]))
+      ) |>
+        range() -> attr(new_design, "range")
+  }
   attr(new_design, "estimate") <- predict_data[
     which.min((predict_data$fit - power)^2),
     opti
