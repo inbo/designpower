@@ -49,8 +49,8 @@ find_power <- function(
   stopifnot(
     is.list(design),
     length(design) >= 1,
-    "`design` has no names" = is.characer(names(design)),
-    "`design_digits` has no names" = is.characer(names(design_digits)),
+    "`design` has no names" = is.character(names(design)),
+    "`design_digits` has no names" = is.character(names(design_digits)),
     "every name in `design` must be present in `design_digits`" = all(
       names(design) %in% names(design_digits)
     ),
@@ -137,7 +137,7 @@ find_power <- function(
     list(design = design, n_sim = 100) |>
       c(extra_args) |>
       do.call(what = sim_power) -> p_values
-    data.frame(design_id = design_id, p = p_values$p) |>
+    data.frame(design_id = design_id, p = get_p_values(p_values)) |>
       dbWriteTable(conn = connection, name = "simulations", append = TRUE)
     observed_power(
       connection = connection,
