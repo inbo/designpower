@@ -22,7 +22,7 @@
 #' @importFrom rlang .data sym
 #' @importFrom stats as.formula binomial plogis predict qnorm
 #' @importFrom tidyr replace_na
-#' @importFrom utils flush.console
+#' @importFrom utils head flush.console tail
 #' @keywords internal
 #' @noRd
 sample_new_design <- function(
@@ -48,11 +48,15 @@ sample_new_design <- function(
   )
   p <- ggplot(power_summary, aes(x = !!sym(opti))) +
     geom_hline(yintercept = power, linetype = 2) +
-    geom_errorbar(aes(ymin = .data$lcl, ymax = .data$ucl, colour = samples)) +
+    geom_errorbar(aes(
+      ymin = .data$lcl,
+      ymax = .data$ucl,
+      colour = .data$samples
+    )) +
     geom_point(aes(
       y = .data$estimated_power,
-      colour = samples,
-      shape = samples
+      colour = .data$samples,
+      shape = .data$samples
     )) +
     geom_blank(data = data.frame(x = 0, y = 0), aes(x = .data$x, y = .data$y)) +
     scale_y_continuous("Estimated power", limits = c(0, 1), labels = percent)
@@ -142,7 +146,7 @@ sample_new_design <- function(
     `colnames<-`(opti) |>
     left_join(
       power_summary |>
-        select(!!opti, "n_sim"),
+        select(!!opti, "n_sim", lower = "lcl", upper = "ucl"),
       by = opti
     ) |>
     mutate(n_sim = replace_na(.data$n_sim, 0)) -> predict_data
@@ -160,8 +164,9 @@ sample_new_design <- function(
     ) -> predict_data
   predict_data |>
     filter(
-      lag(.data$lcl, 1, first(.data$lcl)) < power,
-      lead(.data$ucl, 1, last(.data$ucl)) >= power,
+      (.data$lower < power & power < .data$upper) |
+        (lag(.data$lcl, 1, first(.data$lcl)) < power &
+          lead(.data$ucl, 1, last(.data$ucl)) >= power),
       .data$n_sim < max_sample
     ) -> candidate
   while (nrow(candidate) >= 50) {
