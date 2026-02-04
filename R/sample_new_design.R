@@ -14,9 +14,11 @@
 #' @return Numeric. The next design parameter value to test, or empty vector if
 #'   converged to target power.
 #'
-#' @importFrom dplyr across filter first lag last lead left_join mutate select slice_sample
-#' @importFrom ggplot2 aes geom_blank geom_errorbar geom_hline geom_line geom_point
-#' geom_rect geom_ribbon geom_vline ggplot ggtitle scale_y_continuous
+#' @importFrom dplyr across bind_rows filter first lag last lead left_join
+#'   mutate select slice_sample
+#' @importFrom ggplot2 aes geom_blank geom_errorbar geom_hline geom_line
+#'   geom_point geom_rect geom_ribbon geom_vline ggplot ggtitle
+#'   scale_y_continuous
 #' @importFrom mgcv gam
 #' @importFrom scales percent
 #' @importFrom rlang .data sym
@@ -60,51 +62,25 @@ sample_new_design <- function(
     )) +
     geom_blank(data = data.frame(x = 0, y = 0), aes(x = .data$x, y = .data$y)) +
     scale_y_continuous("Estimated power", limits = c(0, 1), labels = percent)
-  if (0.5 < min(power_summary$ucl)) {
-    if (abs(min(power_summary$estimate) - 1) < 1e-9) {
+  no_small <- 0.5 < min(power_summary$ucl)
+  no_large <- max(power_summary$lcl) < power
+  if (no_small || no_large) {
+    if (abs(min(power_summary$estimate) - no_small) < 1e-9) {
       decrease <- sample(c(TRUE, FALSE), 1)
     } else {
       decrease <- power_summary[which.min(power_summary$estimate), opti] <
         power_summary[which.max(power_summary$estimate), opti]
     }
-    if (decrease) {
-      power_summary[, opti] |>
-        abs() |>
-        min() -> current
-      current <- current / 2
+    power_summary[, opti] |>
+      abs() |>
+      min() -> current_min
+    power_summary[, opti] |>
+      abs() |>
+      max() -> current_max
+    if (xor(decrease, no_small)) {
+      current <- current_min / 2
     } else {
-      power_summary[, opti] |>
-        abs() |>
-        max() -> current
-      current <- current * 2
-    }
-    round(current, digits = design_digits[opti]) |>
-      max(10^-design_digits[opti]) -> new_design
-    new_design * sign(design[[opti]]) -> new_design
-    p <- p +
-      geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +
-      ggtitle(sprintf("next try: %s = %s", opti, as.character(new_design)))
-    print(p)
-    flush.console()
-    return(new_design)
-  }
-  if (max(power_summary$lcl) < power) {
-    if (min(power_summary$estimate) < 1e-9) {
-      decrease <- sample(c(TRUE, FALSE), 1)
-    } else {
-      decrease <- power_summary[which.min(power_summary$estimate), opti] <
-        power_summary[which.max(power_summary$estimate), opti]
-    }
-    if (decrease) {
-      power_summary[, opti] |>
-        abs() |>
-        max() -> current
-      current <- current * 2
-    } else {
-      power_summary[, opti] |>
-        abs() |>
-        min() -> current
-      current <- current / 2
+      current <- current_max * 2
     }
     round(current, digits = design_digits[opti]) |>
       max(10^-design_digits[opti]) -> new_design
@@ -164,10 +140,17 @@ sample_new_design <- function(
     ) -> predict_data
   predict_data |>
     filter(
-      (.data$lower < power & power < .data$upper) |
-        (lag(.data$lcl, 1, first(.data$lcl)) < power &
-          lead(.data$ucl, 1, last(.data$ucl)) >= power),
+      .data$lower < power,
+      power < .data$upper,
       .data$n_sim < max_sample
+    ) |>
+    bind_rows(
+      predict_data |>
+        filter(
+          lag(.data$lcl, 1, first(.data$lcl)) < power,
+          lead(.data$ucl, 1, last(.data$ucl)) >= power,
+          .data$n_sim < max_sample
+        )
     ) -> candidate
   while (nrow(candidate) >= 50) {
     candidate |>
