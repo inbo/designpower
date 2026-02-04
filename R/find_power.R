@@ -152,5 +152,8 @@ find_power <- function(
         power = power
       ) -> new_design
   }
-  c(attr(new_design, "estimate"), attr(new_design, "range"))
+  c(attr(new_design, "estimate"), attr(new_design, "range")) |>
+    `attr<-`("design", design[names(design) != opti]) |>
+    `attr<-`("opti", opti) |>
+    `attr<-`("extra_args", extra_args)
 }
