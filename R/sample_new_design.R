@@ -8,12 +8,14 @@
 #' @param opti Character. Name of parameter to optimize.
 #' @param design_digits Named numeric. Precision for each design parameter.
 #' @param power Numeric. Target power (default 0.9).
+#' @param max_sample Numeric. Maximum number of simulations to consider for
+#'  candidate selection (default 1000).
 #'
 #' @return Numeric. The next design parameter value to test, or empty vector if
 #'   converged to target power.
 #'
 #' @importFrom dplyr across filter first lag last lead left_join mutate select slice_sample
-#' @importFrom ggplot2 aes geom_errorbar geom_hline geom_line geom_point
+#' @importFrom ggplot2 aes geom_blank geom_errorbar geom_hline geom_line geom_point
 #' geom_rect geom_ribbon geom_vline ggplot ggtitle scale_y_continuous
 #' @importFrom mgcv gam
 #' @importFrom scales percent
@@ -28,7 +30,8 @@ sample_new_design <- function(
   design,
   opti,
   design_digits,
-  power = 0.9
+  power = 0.9,
+  max_sample = 1000
 ) {
   stopifnot(
     length(opti) == 1
@@ -36,10 +39,22 @@ sample_new_design <- function(
   if (nrow(power_summary) == 0) {
     return(design[[opti]])
   }
+  power_summary$samples <- ifelse(
+    (power_summary$non_signif + power_summary$signif >= max_sample) |
+      power_summary$ucl < power |
+      power < power_summary$lcl,
+    "sufficient",
+    "insufficient"
+  )
   p <- ggplot(power_summary, aes(x = !!sym(opti))) +
     geom_hline(yintercept = power, linetype = 2) +
-    geom_errorbar(aes(ymin = .data$lcl, ymax = .data$ucl)) +
-    geom_point(aes(y = .data$estimated_power)) +
+    geom_errorbar(aes(ymin = .data$lcl, ymax = .data$ucl, colour = samples)) +
+    geom_point(aes(
+      y = .data$estimated_power,
+      colour = samples,
+      shape = samples
+    )) +
+    geom_blank(data = data.frame(x = 0, y = 0), aes(x = .data$x, y = .data$y)) +
     scale_y_continuous("Estimated power", limits = c(0, 1), labels = percent)
   if (0.5 < min(power_summary$ucl)) {
     if (abs(min(power_summary$estimate) - 1) < 1e-9) {
@@ -147,7 +162,7 @@ sample_new_design <- function(
     filter(
       lag(.data$lcl, 1, first(.data$lcl)) < power,
       lead(.data$ucl, 1, last(.data$ucl)) >= power,
-      .data$n_sim < 1000
+      .data$n_sim < max_sample
     ) -> candidate
   while (nrow(candidate) >= 50) {
     candidate |>
@@ -158,7 +173,7 @@ sample_new_design <- function(
       filter(.data$subset < max(.data$subset)) -> candidate
   }
   candidate |>
-    slice_sample(n = 1, weight_by = 1000 - .data$n_sim) -> new_design
+    slice_sample(n = 1, weight_by = max_sample - .data$n_sim) -> new_design
   new_design <- unlist(new_design[[opti]])
   if (head(predict_data$fit, 1) < tail(predict_data$fit, 1)) {
     sign(design[[opti]]) *
