@@ -18,7 +18,7 @@
 #'   mutate select slice_sample
 #' @importFrom ggplot2 aes geom_blank geom_errorbar geom_hline geom_line
 #'   geom_point geom_rect geom_ribbon geom_vline ggplot ggtitle
-#'   scale_y_continuous
+#'   scale_x_continuous scale_y_continuous
 #' @importFrom mgcv gam
 #' @importFrom scales percent
 #' @importFrom rlang .data sym
@@ -106,11 +106,18 @@ sample_new_design <- function(
     flush.console()
     return(new_design)
   }
-  power_summary$non_signif <- pmax(power_summary$non_signif, 1)
-  power_summary$signif <- pmax(power_summary$signif, 1)
-  sprintf("cbind(signif, non_signif) ~ s(%s, bs = \"cs\", k = 3)", opti) |>
-    as.formula() |>
-    gam(data = power_summary, family = binomial()) -> power_model
+  power_summary <- preprare_model_data(power_summary)
+  try(
+    sprintf("cbind(signif, non_signif) ~ s(%s, bs = \"cs\", k = 3)", opti) |>
+      as.formula() |>
+      gam(data = power_summary, family = binomial()),
+    silent = TRUE
+  ) -> power_model
+  if (inherits(power_model, "try-error")) {
+    sprintf("cbind(signif, non_signif) ~ s(%s, bs = \"cs\", k = 4)", opti) |>
+      as.formula() |>
+      gam(data = power_summary, family = binomial()) -> power_model
+  }
   data.frame(
     x = seq(
       pmax(min(abs(power_summary[, opti])), 10^(-design_digits[[opti]])),
@@ -213,7 +220,8 @@ sample_new_design <- function(
         opti,
         as.character(new_design)
       )
-    )
+    ) +
+    scale_x_continuous(limits = range(c(0, predict_data[[opti]])))
   print(p)
   flush.console()
   return(new_design)
