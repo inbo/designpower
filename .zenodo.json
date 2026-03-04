@@ -1,6 +1,6 @@
 {
   "title": "designpower: Design Power Analysis Tools",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "GPL-3.0",
   "upload_type": "software",
   "description": "<p>Tools for iterative power analysis and design optimization using simulation and adaptive sampling strategies.<\/p>",

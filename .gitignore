@@ -30,10 +30,8 @@
 .Ruserdata
 .httr-oauth
 .quarto
-NAMESPACE
 docs
 libs
-man/
 output
 renv/library
 tests/testthat/_snaps/

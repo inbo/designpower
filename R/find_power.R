@@ -8,10 +8,12 @@
 #' @param design List. Initial design parameters.
 #' @param design_digits Named numeric. Precision (number of decimal places) for
 #' each parameter.
+#' The names must match those in `design`.
 #' @param opti Character. Name of parameter to optimize.
 #' @param sim_power Function. Simulation function (should accept `design` and
 #' `n_sim`).
 #' @param extra_args List. Optional additional arguments passed to `sim_power`.
+#' Defaults to an empty list.
 #' @param power Numeric. Target power (default 0.9).
 #' @param alpha Numeric. Significance level (default 0.1).
 #' @param filename Character. Path to `DuckDB` database file.
@@ -39,15 +41,34 @@ find_power <- function(
   design_digits,
   opti,
   sim_power,
-  extra_args,
+  extra_args = list(),
   power = 0.9,
   alpha = 0.1,
   filename = "power.duckdb"
 ) {
   stopifnot(
+    is.list(design),
+    length(design) >= 1,
+    "`design` has no names" = is.character(names(design)),
+    "`design_digits` has no names" = is.character(names(design_digits)),
+    "every name in `design` must be present in `design_digits`" = all(
+      names(design) %in% names(design_digits)
+    ),
     length(opti) == 1,
-    length(design) > length(opti),
+    is.character(opti),
     all(opti %in% names(design)),
+    is.function(sim_power),
+    "`sim_power` must have a `design` argument" = "design" %in%
+      names(formals(sim_power)),
+    "`sim_power` must have a `n_sim` argument" = "n_sim" %in%
+      names(formals(sim_power)),
+    is.list(extra_args),
+    is.character(filename),
+    length(filename) == 1,
+    is.numeric(alpha),
+    length(alpha) == 1,
+    is.numeric(power),
+    length(power) == 1,
     0 < alpha,
     alpha < power,
     power < 1
@@ -116,7 +137,7 @@ find_power <- function(
     list(design = design, n_sim = 100) |>
       c(extra_args) |>
       do.call(what = sim_power) -> p_values
-    data.frame(design_id = design_id, p = p_values$p) |>
+    data.frame(design_id = design_id, p = get_p_values(p_values)) |>
       dbWriteTable(conn = connection, name = "simulations", append = TRUE)
     observed_power(
       connection = connection,
@@ -131,5 +152,8 @@ find_power <- function(
         power = power
       ) -> new_design
   }
-  c(attr(new_design, "estimate"), attr(new_design, "range"))
+  c(attr(new_design, "estimate"), attr(new_design, "range")) |>
+    `attr<-`("design", design[names(design) != opti]) |>
+    `attr<-`("opti", opti) |>
+    `attr<-`("extra_args", extra_args)
 }
