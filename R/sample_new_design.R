@@ -68,7 +68,7 @@ sample_new_design <- function(
     if (abs(min(power_summary$estimate) - no_small) < 1e-9) {
       decrease <- sample(c(TRUE, FALSE), 1)
     } else {
-      decrease <- power_summary[which.min(power_summary$estimate), opti] <
+      decrease <- power_summary[which.min(power_summary$estimate), opti] <=
         power_summary[which.max(power_summary$estimate), opti]
     }
     power_summary[, opti] |>
@@ -77,12 +77,8 @@ sample_new_design <- function(
     power_summary[, opti] |>
       abs() |>
       max() -> current_max
-    if (xor(decrease, no_small)) {
-      current <- current_min / 2
-    } else {
-      current <- current_max * 2
-    }
-    round(current, digits = design_digits[opti]) |>
+    ifelse(no_small, current_min / 2, current_max * 2) |>
+      round(digits = design_digits[opti]) |>
       max(10^-design_digits[opti]) -> new_design
     new_design * sign(design[[opti]]) -> new_design
     p <- p +
