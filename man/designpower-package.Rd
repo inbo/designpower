@@ -27,7 +27,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Research Institute for Nature and Forest (INBO) \email{info@inbo.be} (\href{https://ror.org/00j54wy13}{ROR}) [copyright holder, funder]
+  \item Research Institute for Nature and Forest (INBO) \email{info@inbo.be} (\href{https://ror.org/00j54wy13}{ROR}) [copyright holder, funder, publisher]
 }
 
 }

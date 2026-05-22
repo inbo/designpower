@@ -15,10 +15,10 @@
 #'   converged to target power.
 #'
 #' @importFrom dplyr across bind_rows filter first lag last lead left_join
-#'   mutate select slice_sample
+#' @importFrom dplyr mutate select slice_sample
 #' @importFrom ggplot2 aes geom_blank geom_errorbar geom_hline geom_line
-#'   geom_point geom_rect geom_ribbon geom_vline ggplot ggtitle
-#'   scale_x_continuous scale_y_continuous
+#' @importFrom ggplot2 geom_point geom_rect geom_ribbon geom_vline ggplot
+#' @importFrom ggplot2 ggtitle scale_x_continuous scale_y_continuous
 #' @importFrom mgcv gam
 #' @importFrom scales percent
 #' @importFrom rlang .data sym
