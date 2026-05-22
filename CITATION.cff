@@ -7,7 +7,10 @@ authors:
   affiliation: Research Institute for Nature and Forest (INBO)
   orcid: 0000-0001-8804-4216
 keywords:
-- sample size, power analysis, design optimization
+- sample size
+- power analysis
+- design optimization
+- inbo_version
 contact:
 - given-names: Thierry
   family-names: Onkelinx
@@ -19,4 +22,4 @@ repository-code: https://github.com/inbo/designpower/
 type: software
 abstract: "Tools for iterative power analysis and design optimization using simulation
   and adaptive sampling strategies."
-version: 0.0.2
+version: 0.0.3

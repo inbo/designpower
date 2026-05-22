@@ -1,3 +1,7 @@
+# designpower 0.0.3
+
+* Bugfixes to the power calculation functions.
+
 # designpower 0.0.2
 
 * Bugfixes and improvements to the power calculation functions.

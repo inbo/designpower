@@ -18,7 +18,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (Research Institute for Nature and Forest (INBO))
+\strong{Maintainer}: Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (affiliation: Research Institute for Nature and Forest (INBO))
+
+Authors:
+\itemize{
+  \item Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (affiliation: Research Institute for Nature and Forest (INBO))
+}
 
 Other contributors:
 \itemize{
