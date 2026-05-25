@@ -21,8 +21,8 @@
 #' @importFrom ggplot2 ggtitle scale_x_continuous scale_y_continuous
 #' @importFrom mgcv gam
 #' @importFrom scales percent
-#' @importFrom rlang .data sym
-#' @importFrom stats as.formula binomial plogis predict qnorm
+#' @importFrom rlang .data sym !!
+#' @importFrom stats as.formula binomial coef glm plogis predict qnorm
 #' @importFrom tidyr replace_na
 #' @importFrom utils head flush.console tail
 #' @keywords internal
@@ -35,12 +35,13 @@ sample_new_design <- function(
   power = 0.9,
   max_sample = 1000
 ) {
-  stopifnot(
-    length(opti) == 1
-  )
+  stopifnot(length(opti) == 1)
+  # empty power summary means we are at the first iteration, so return the
+  # initial design parameter
   if (nrow(power_summary) == 0) {
     return(design[[opti]])
   }
+  # determine if we have sufficient simulations for each design parameter value
   power_summary$samples <- ifelse(
     (power_summary$non_signif + power_summary$signif >= max_sample) |
       power_summary$ucl < power |
@@ -48,6 +49,7 @@ sample_new_design <- function(
     "sufficient",
     "insufficient"
   )
+  # prepare the plot
   p <- ggplot(power_summary, aes(x = !!sym(opti))) +
     geom_hline(yintercept = power, linetype = 2) +
     geom_errorbar(aes(
@@ -62,14 +64,25 @@ sample_new_design <- function(
     )) +
     geom_blank(data = data.frame(x = 0, y = 0), aes(x = .data$x, y = .data$y)) +
     scale_y_continuous("Estimated power", limits = c(0, 1), labels = percent)
+  # check if we have both low and high power estimates
+  # if not expand the search space by doubling the largest or halving the
+  # smallest design parameter value
   no_small <- 0.5 < min(power_summary$ucl)
   no_large <- max(power_summary$lcl) < power
   if (no_small || no_large) {
-    if (abs(min(power_summary$estimate) - no_small) < 1e-9) {
+    # all estimates are either 1 or 0, so we cannot determine the direction of
+    # change based on the model, so we randomly choose to increase or decrease
+    # the design parameter
+    if (abs(min(power_summary$estimated_power) - no_small) < 1e-9) {
       decrease <- sample(c(TRUE, FALSE), 1)
     } else {
-      decrease <- power_summary[which.min(power_summary$estimate), opti] <
-        power_summary[which.max(power_summary$estimate), opti]
+      sprintf("cbind(signif, non_signif) ~ %s", opti) |>
+        as.formula() |>
+        glm(
+          data = power_summary,
+          family = binomial
+        ) -> power_model
+      decrease <- xor(no_small, coef(power_model)[2] < 0)
     }
     power_summary[, opti] |>
       abs() |>
@@ -81,6 +94,7 @@ sample_new_design <- function(
       round(digits = design_digits[opti]) |>
       max(10^-design_digits[opti]) -> new_design
     new_design * sign(design[[opti]]) -> new_design
+    # add vertical line with the estimate to plot and print
     p <- p +
       geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +
       ggtitle(sprintf("next try: %s = %s", opti, as.character(new_design)))
@@ -88,7 +102,11 @@ sample_new_design <- function(
     flush.console()
     return(new_design)
   }
-  if (nrow(power_summary) <= 2) {
+  # in the corner case that we only have two design parameter values, one low
+  # and one high, we cannot fit a model, so we just return the average of the
+  # two design parameter values that are below and above the target power,
+  # respectively
+  if (nrow(power_summary) == 2) {
     c(
       power_summary[power_summary$ucl < power, opti],
       power_summary[power_summary$lcl > power, opti]
