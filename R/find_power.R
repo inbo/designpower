@@ -149,7 +149,8 @@ find_power <- function(
       list(design = design, n_sim = 100) |>
         c(extra_args) |>
         do.call(what = sim_power)
-    }) -> p_values
+    }) |>
+      unlist() -> p_values
     stopifnot(
       "`sim_power` must return a single p-value" = is.vector(p_values),
       "`sim_power` must return non-negative p-values" = all(p_values >= 0),
