@@ -41,6 +41,10 @@ sample_new_design <- function(
   if (nrow(power_summary) == 0) {
     return(design[[opti]])
   }
+  if (nrow(power_summary) == 1) {
+    return(round(2 * power_summary[, opti], digits = design_digits[opti]))
+  }
+
   # determine if we have sufficient simulations for each design parameter value
   power_summary$samples <- ifelse(
     (power_summary$non_signif + power_summary$signif >= max_sample) |
