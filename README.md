@@ -57,13 +57,10 @@ example:
 library(designpower)
 
 # Define your simulation function
-my_sim <- function(design, n_sim, ...) {
-  replicate(n_sim, {
-    # Your simulation logic here
-    # Should return p-values
-    runif(1)
-  }) |>
-    list(p = _)
+my_sim <- function(design) {
+  # Your simulation logic here
+  # Should return p-values
+  runif(1)
 }
 
 # Find optimal design parameters

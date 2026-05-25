@@ -12,7 +12,9 @@ find_power(
   extra_args = list(),
   power = 0.9,
   alpha = 0.1,
-  filename = "power.duckdb"
+  filename = "power.duckdb",
+  n_sim = 100,
+  max_sim = 1000
 )
 }
 \arguments{
@@ -24,8 +26,8 @@ The names must match those in \code{design}.}
 
 \item{opti}{Character. Name of parameter to optimize.}
 
-\item{sim_power}{Function. Simulation function (should accept \code{design} and
-\code{n_sim}).}
+\item{sim_power}{Function. Simulation function (must accept \code{design}).
+Must return a single p-value.}
 
 \item{extra_args}{List. Optional additional arguments passed to \code{sim_power}.
 Defaults to an empty list.}
@@ -35,6 +37,12 @@ Defaults to an empty list.}
 \item{alpha}{Numeric. Significance level (default 0.1).}
 
 \item{filename}{Character. Path to \code{DuckDB} database file.}
+
+\item{n_sim}{Integer. Number of simulations to run per iteration (default
+100).}
+
+\item{max_sim}{Integer. Maximum number of simulations to consider for
+candidate selection (default 1000).}
 }
 \value{
 Numeric vector. The optimized parameter value and confidence range.
