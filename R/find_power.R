@@ -17,8 +17,11 @@
 #' @param power Numeric. Target power (default 0.9).
 #' @param alpha Numeric. Significance level (default 0.1).
 #' @param filename Character. Path to `DuckDB` database file.
-#' @param n_sim Integer. Number of simulations to run per iteration (default
-#' 100).
+#' @param n_sim Integer.
+#' Number of simulations to run per iteration (default 100).
+#' One iteration consists of running `n_sim` simulations at the current design
+#' parameter value, then updating the design parameter based on the observed
+#' power.
 #' @param max_sim Integer. Maximum number of simulations to consider for
 #' candidate selection (default 1000).
 #'
