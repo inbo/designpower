@@ -17,7 +17,7 @@ contact:
   affiliation: Research Institute for Nature and Forest (INBO)
   orcid: 0000-0001-8804-4216
 doi: ~
-license: GPL-3.0
+license: GPL-3.0-only
 repository-code: https://github.com/inbo/designpower/
 type: software
 abstract: "Tools for iterative power analysis and design optimization using simulation
