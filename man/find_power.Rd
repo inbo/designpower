@@ -14,7 +14,8 @@ find_power(
   alpha = 0.1,
   filename = "power.duckdb",
   n_sim = 100,
-  max_sim = 1000
+  max_sim = 1000,
+  opti_range = NULL
 )
 }
 \arguments{
@@ -46,6 +47,11 @@ power.}
 
 \item{max_sim}{Integer. Maximum number of simulations to consider for
 candidate selection (default 1000).}
+
+\item{opti_range}{Numeric of length 2. Optional lower and upper limit for the
+parameter given in \code{opti}.
+When specified, only values within this range are simulated and reported.
+When \code{NULL} (default), the search space is unrestricted.}
 }
 \value{
 Numeric vector. The optimized parameter value and confidence range.

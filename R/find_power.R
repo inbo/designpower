@@ -24,6 +24,10 @@
 #' power.
 #' @param max_sim Integer. Maximum number of simulations to consider for
 #' candidate selection (default 1000).
+#' @param opti_range Numeric of length 2. Optional lower and upper limit for the
+#' parameter given in `opti`.
+#' When specified, only values within this range are simulated and reported.
+#' When `NULL` (default), the search space is unrestricted.
 #'
 #' @return Numeric vector. The optimized parameter value and confidence range.
 #'
@@ -53,7 +57,8 @@ find_power <- function(
   alpha = 0.1,
   filename = "power.duckdb",
   n_sim = 100,
-  max_sim = 1000
+  max_sim = 1000,
+  opti_range = NULL
 ) {
   stopifnot(
     is.list(design),
@@ -86,6 +91,22 @@ find_power <- function(
     length(max_sim) == 1,
     n_sim <= max_sim
   )
+  if (!is.null(opti_range)) {
+    stopifnot(
+      "`opti_range` must be a numeric vector of length 2" = (is.numeric(
+        opti_range
+      ) &&
+        length(opti_range) == 2),
+      "`opti_range` must have two different values" = min(opti_range) <
+        max(opti_range),
+      "`opti_range` must not include zero" = min(abs(opti_range)) > 0,
+      "`opti_range` must have the same sign" = prod(sign(opti_range)) == 1
+    )
+    opti_range <- round(opti_range, digits = design_digits[[opti]]) |>
+      sort()
+    # make sure the starting value lies within the requested range
+    design[[opti]] <- min(max(design[[opti]], opti_range[1]), opti_range[2])
+  }
 
   design <- vapply(
     names(design),
@@ -114,6 +135,16 @@ find_power <- function(
       sprintf("%s %s 0", opti, ifelse(design[[opti]] > 0, ">", "<"))
     ) |>
     paste(collapse = " AND ") -> where_clause
+  if (!is.null(opti_range)) {
+    where_clause <- sprintf(
+      "%s AND d.%s BETWEEN %.15g AND %.15g",
+      where_clause,
+      opti,
+      min(opti_range),
+      max(opti_range)
+    )
+  }
+
   paste0("d.", opti, collapse = ", ") -> opti_clause
 
   design_id <- get_design_id(
@@ -135,7 +166,8 @@ find_power <- function(
       design_digits = design_digits,
       opti = opti,
       power = power,
-      max_sample = max_sim
+      max_sample = max_sim,
+      opti_range = opti_range
     ) -> new_design
   while (length(new_design) > 0) {
     design[[opti]] <- new_design
@@ -156,9 +188,9 @@ find_power <- function(
       unlist() -> p_values
     stopifnot(
       "`sim_power` must return a single p-value" = is.vector(p_values),
+      "`sim_power` must return a number" = inherits(p_values, "numeric"),
       "`sim_power` must return non-negative p-values" = all(p_values >= 0),
-      "`sim_power` must return p-values not above 1" = all(p_values <= 1),
-      "`sim_power` must return a single p-value" = inherits(p_values, "numeric")
+      "`sim_power` must return p-values not above 1" = all(p_values <= 1)
     )
     data.frame(design_id = design_id, p = p_values) |>
       dbWriteTable(conn = connection, name = "simulations", append = TRUE)
@@ -173,7 +205,8 @@ find_power <- function(
         design_digits = design_digits,
         opti = opti,
         power = power,
-        max_sample = max_sim
+        max_sample = max_sim,
+        opti_range = opti_range
       ) -> new_design
   }
   c(attr(new_design, "estimate"), attr(new_design, "range")) |>

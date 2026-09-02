@@ -8,9 +8,10 @@ no_extremes <- function(
   p,
   opti,
   design,
-  design_digits
+  design_digits,
+  opti_range
 ) {
-  if (abs(min(power_summary$estimated_power) - no_small) < 1e-9) {
+  if (abs(no_small - min(power_summary$estimated_power)) < 1e-3) {
     # all estimates are either 1 or 0, so we cannot determine the direction of
     # change based on the model, so we randomly choose to increase or decrease
     # the design parameter
@@ -34,6 +35,11 @@ no_extremes <- function(
     round(digits = design_digits[opti]) |>
     max(10^-design_digits[opti]) -> new_design
   new_design * sign(design[[opti]]) -> new_design
+  if (!is.null(opti_range)) {
+    new_design |>
+      min(max(opti_range)) |>
+      max(min(opti_range)) -> new_design
+  }
   # add vertical line with the estimate to plot and print
   p <- p +
     geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +

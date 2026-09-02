@@ -15,8 +15,15 @@ opti_model <- function(
   design,
   opti,
   max_sample,
-  design_digits
+  design_digits,
+  opti_range = NULL
 ) {
+  if (is.null(opti_range)) {
+    opti_range <- c(0, Inf)
+  } else {
+    abs(opti_range) |>
+      range() -> opti_range
+  }
   power_summary <- preprare_model_data(power_summary)
   try(
     sprintf("cbind(signif, non_signif) ~ s(%s, bs = \"cs\", k = 3)", opti) |>
@@ -31,8 +38,12 @@ opti_model <- function(
   }
   data.frame(
     x = seq(
-      pmax(min(abs(power_summary[, opti])), 10^(-design_digits[[opti]])),
-      max(abs(power_summary[, opti])) * 1.05,
+      max(
+        min(abs(power_summary[, opti])),
+        10^(-design_digits[[opti]]),
+        opti_range[1]
+      ),
+      min(max(abs(power_summary[, opti])) * 1.05, opti_range[2]),
       by = 10^(-design_digits[[opti]])
     ) *
       sign(design[[opti]])
@@ -44,6 +55,7 @@ opti_model <- function(
       by = opti
     ) |>
     mutate(n_sim = replace_na(.data$n_sim, 0)) -> predict_data
+  # only keep candidate values within the user defined range
   prediction <- predict(
     object = power_model,
     newdata = predict_data,
