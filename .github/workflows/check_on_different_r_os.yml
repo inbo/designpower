@@ -2,11 +2,9 @@ on:
   push:
     branches:
       - main
-      - master
   pull_request:
     branches:
       - main
-      - master
 
 name: R-CMD-check-OS
 
@@ -32,20 +30,20 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
 
-      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r@d06a5400951e7a0b9eb17f3212e5e99e906af4f8
         with:
           r-version: ${{ matrix.config.r }}
           extra-repositories: https://inbo.r-universe.dev
 
-      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-pandoc@33d09fb4fbbaf52fe0f0de4842fe6e0613671044
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - uses: r-lib/actions/setup-r-dependencies@c86f32c625d1691ec087e268bebdabcb1e20565d
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - uses: r-lib/actions/check-r-package@v2
+      - uses: r-lib/actions/check-r-package@5cc1f0d89c5281319eaa97952fe65a6d55e6f816
         with:
           error-on: '"error"'
