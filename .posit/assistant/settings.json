@@ -1,0 +1,14 @@
+{
+  "permission": {
+    "skill": {
+      "r-pkg-code": "allow"
+    },
+    "edit": {
+      "*.R": "allow"
+    },
+    "bash": {
+      "Rscript *": "allow",
+      "tail *": "allow"
+    }
+  }
+}
