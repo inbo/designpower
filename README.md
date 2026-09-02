@@ -27,9 +27,9 @@ coverage](https://codecov.io/gh/inbo/designpower/branch/main/graph/badge.svg)](h
 # designpower: Design Power Analysis Tools
 
 [Onkelinx, Thierry![ORCID
-logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0001-8804-4216)[^1][^2][^3]
-[Research Institute for Nature and Forest
-(INBO)](mailto:info%40inbo.be)[^4][^5]
+logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0001-8804-4216)[^1]
+[^2] [^3] [Research Institute for Nature and Forest
+(INBO)](mailto:info%40inbo.be)[^4] [^5]
 
 **keywords**: sample size, power analysis, design optimization
 
