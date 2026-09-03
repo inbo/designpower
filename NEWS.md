@@ -1,7 +1,7 @@
 # designpower 0.0.3
 
 * `find_power()` gains an optional `opti_range` argument.
-  Use this argument to restrict the optimalisation range.
+  Use this argument to restrict the optimization range.
 * Bugfixes to the power calculation functions.
 
 # designpower 0.0.2

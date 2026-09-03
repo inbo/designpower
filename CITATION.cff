@@ -22,4 +22,7 @@ repository-code: https://github.com/inbo/designpower/
 type: software
 abstract: "Tools for iterative power analysis and design optimization using simulation
   and adaptive sampling strategies."
+identifiers:
+- type: url
+  value: https://inbo.github.io/designpower/
 version: 0.0.3

@@ -5,9 +5,9 @@ bibentry(
   title = "designpower: Design Power Analysis Tools. Version 0.0.3",
   author = c(person(given = "Thierry", family = "Onkelinx")),
   year = 2026,
-  url = "https://github.com/inbo/designpower/",
+  url = "https://inbo.github.io/designpower/",
   abstract = "Tools for iterative power analysis and design optimization using simulation and adaptive sampling strategies.",
-  textVersion = "Onkelinx, Thierry (2026) designpower: Design Power Analysis Tools. Version 0.0.3. https://github.com/inbo/designpower/",
+  textVersion = "Onkelinx, Thierry (2026) designpower: Design Power Analysis Tools. Version 0.0.3. https://inbo.github.io/designpower/",
   keywords = "sample size; power analysis; design optimization; inbo_version",
 )
 # end checklist entry

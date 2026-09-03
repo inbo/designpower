@@ -12,7 +12,7 @@ simulation and adaptive sampling strategies.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/inbo/designpower}
+  \item \url{https://inbo.github.io/designpower/} \url{https://github.com/inbo/designpower}
   \item Report bugs at \url{https://github.com/inbo/designpower/issues}
 }
 
