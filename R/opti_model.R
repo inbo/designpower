@@ -82,13 +82,13 @@ opti_model <- function(
           .data$n_sim < max_sample
         )
     ) -> candidate
-  while (nrow(candidate) >= 50) {
+  if (nrow(candidate) >= 50) {
     candidate |>
       mutate(
         subset = as.character(!!sym(opti)) |>
           nchar()
       ) |>
-      filter(.data$subset < max(.data$subset)) -> candidate
+      filter(.data$subset == min(.data$subset)) -> candidate
   }
   candidate |>
     slice_sample(n = 1, weight_by = max_sample - .data$n_sim) -> new_design
