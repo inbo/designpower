@@ -11,6 +11,7 @@ no_extremes <- function(
   design_digits,
   opti_range
 ) {
+  current_range <- range(power_summary[, opti])
   if (abs(no_small - min(power_summary$estimated_power)) < 1e-3) {
     # all estimates are either 1 or 0, so we cannot determine the direction of
     # change based on the model, so we randomly choose to increase or decrease
@@ -23,12 +24,13 @@ no_extremes <- function(
         data = power_summary,
         family = binomial
       ) -> power_model
-    decrease <- xor(no_small, coef(power_model)[2] < 0)
+    xor(no_small, coef(power_model)[2] > 0) |>
+      xor(current_range[1] > 0) -> decrease
   }
-  power_summary[, opti] |>
+  current_range |>
     abs() |>
     min() -> current_min
-  power_summary[, opti] |>
+  current_range |>
     abs() |>
     max() -> current_max
   ifelse(decrease, current_min / 2, current_max * 2) |>
