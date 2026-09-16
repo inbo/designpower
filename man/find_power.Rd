@@ -15,7 +15,8 @@ find_power(
   filename = "power.duckdb",
   n_sim = 100,
   max_sim = 1000,
-  opti_range = NULL
+  opti_range = NULL,
+  opti_ratio = 0.2
 )
 }
 \arguments{
@@ -52,6 +53,14 @@ candidate selection (default 1000).}
 parameter given in \code{opti}.
 When specified, only values within this range are simulated and reported.
 When \code{NULL} (default), the search space is unrestricted.}
+
+\item{opti_ratio}{Numeric.
+Stop searching when ratio between the width of the optimal interval and
+the current optimal value is below this threshold (default 0.2).
+Set this to a lower value to get more precise estimates of the optimal design
+parameter.
+We recommend to start with the default value of 0.2.
+Then improve the search with a lower value if needed.}
 }
 \value{
 Numeric vector. The optimized parameter value and confidence range.

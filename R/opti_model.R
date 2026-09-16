@@ -16,7 +16,8 @@ opti_model <- function(
   opti,
   max_sample,
   design_digits,
-  opti_range = NULL
+  opti_range = NULL,
+  opti_ratio = 0.2
 ) {
   if (is.null(opti_range)) {
     opti_range <- c(0, Inf)
@@ -70,17 +71,18 @@ opti_model <- function(
     ) -> predict_data
   predict_data |>
     filter(
+      lag(.data$lcl, 1, first(.data$lcl)) < power,
+      lead(.data$ucl, 1, last(.data$ucl)) >= power,
+      .data$n_sim < max_sample
+    ) -> current_range
+  predict_data |>
+    filter(
       .data$lower < power,
       power < .data$upper,
       .data$n_sim < max_sample
     ) |>
     bind_rows(
-      predict_data |>
-        filter(
-          lag(.data$lcl, 1, first(.data$lcl)) < power,
-          lead(.data$ucl, 1, last(.data$ucl)) >= power,
-          .data$n_sim < max_sample
-        )
+      current_range
     ) -> candidate
   if (nrow(candidate) >= 50) {
     candidate |>
@@ -147,5 +149,14 @@ opti_model <- function(
     scale_x_continuous(limits = range(c(0, predict_data[[opti]])))
   print(p)
   flush.console()
+  attr(new_design, "range") |>
+    diff() -> current_range
+  if (abs(current_range / attr(new_design, "estimate")) < opti_ratio) {
+    return(
+      numeric(0) |>
+        `attr<-`("estimate", attr(new_design, "estimate")) |>
+        `attr<-`("range", attr(new_design, "range"))
+    )
+  }
   return(new_design)
 }

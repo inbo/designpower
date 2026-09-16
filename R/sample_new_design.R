@@ -29,7 +29,8 @@ sample_new_design <- function(
   design_digits,
   power = 0.9,
   max_sample = 1000,
-  opti_range = NULL
+  opti_range = NULL,
+  opti_ratio = 0.2
 ) {
   stopifnot(length(opti) == 1)
   # empty power summary means we are at the first iteration, so return the
@@ -102,7 +103,8 @@ sample_new_design <- function(
       design_digits = design_digits,
       opti = opti,
       max_sample = max_sample,
-      opti_range = opti_range
+      opti_range = opti_range,
+      opti_ratio = opti_ratio
     )
   ) -> new_design
   # clamping can return a value that was already simulated to the maximum

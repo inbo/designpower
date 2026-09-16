@@ -28,6 +28,13 @@
 #' parameter given in `opti`.
 #' When specified, only values within this range are simulated and reported.
 #' When `NULL` (default), the search space is unrestricted.
+#' @param opti_ratio Numeric.
+#' Stop searching when ratio between the width of the optimal interval and
+#' the current optimal value is below this threshold (default 0.2).
+#' Set this to a lower value to get more precise estimates of the optimal design
+#' parameter.
+#' We recommend to start with the default value of 0.2.
+#' Then improve the search with a lower value if needed.
 #'
 #' @return Numeric vector. The optimized parameter value and confidence range.
 #'
@@ -58,7 +65,8 @@ find_power <- function(
   filename = "power.duckdb",
   n_sim = 100,
   max_sim = 1000,
-  opti_range = NULL
+  opti_range = NULL,
+  opti_ratio = 0.2
 ) {
   stopifnot(
     is.list(design),
@@ -89,7 +97,10 @@ find_power <- function(
     n_sim > 0,
     is.numeric(max_sim),
     length(max_sim) == 1,
-    n_sim <= max_sim
+    n_sim <= max_sim,
+    is.numeric(opti_ratio),
+    length(opti_ratio) == 1,
+    0 < opti_ratio
   )
   if (!is.null(opti_range)) {
     stopifnot(
@@ -167,7 +178,8 @@ find_power <- function(
       opti = opti,
       power = power,
       max_sample = max_sim,
-      opti_range = opti_range
+      opti_range = opti_range,
+      opti_ratio = opti_ratio
     ) -> new_design
   while (length(new_design) > 0) {
     design[[opti]] <- new_design
@@ -206,7 +218,8 @@ find_power <- function(
         opti = opti,
         power = power,
         max_sample = max_sim,
-        opti_range = opti_range
+        opti_range = opti_range,
+        opti_ratio = opti_ratio
       ) -> new_design
   }
   c(attr(new_design, "estimate"), attr(new_design, "range")) |>
