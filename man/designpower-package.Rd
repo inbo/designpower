@@ -12,17 +12,22 @@ simulation and adaptive sampling strategies.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/inbo/designpower}
+  \item \url{https://inbo.github.io/designpower/} \url{https://github.com/inbo/designpower}
   \item Report bugs at \url{https://github.com/inbo/designpower/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (Research Institute for Nature and Forest (INBO))
+\strong{Maintainer}: Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (affiliation: Research Institute for Nature and Forest (INBO))
+
+Authors:
+\itemize{
+  \item Thierry Onkelinx \email{thierry.onkelinx@inbo.be} (\href{https://orcid.org/0000-0001-8804-4216}{ORCID}) (affiliation: Research Institute for Nature and Forest (INBO))
+}
 
 Other contributors:
 \itemize{
-  \item Research Institute for Nature and Forest (INBO) \email{info@inbo.be} (\href{https://ror.org/00j54wy13}{ROR}) [copyright holder, funder]
+  \item Research Institute for Nature and Forest (INBO) \email{info@inbo.be} (\href{https://ror.org/00j54wy13}{ROR}) [copyright holder, funder, publisher]
 }
 
 }
