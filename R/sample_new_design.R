@@ -47,8 +47,9 @@ sample_new_design <- function(
   # determine if we have sufficient simulations for each design parameter value
   power_summary$samples <- ifelse(
     (power_summary$non_signif + power_summary$signif >= max_sample) |
-      power_summary$ucl < power |
-      power < power_summary$lcl,
+      (power_summary$non_signif + power_summary$signif >= 40 &
+        (power_summary$ucl < power |
+          power < power_summary$lcl)),
     "sufficient",
     "insufficient"
   )
