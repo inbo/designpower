@@ -71,6 +71,7 @@ opti_model <- function(
     ) -> predict_data
   predict_data |>
     filter(
+      lag(.data$lcl, 1, first(.data$lcl)) <= .data$lcl,
       lag(.data$lcl, 1, first(.data$lcl)) < power,
       lead(.data$ucl, 1, last(.data$ucl)) >= power,
       .data$n_sim < max_sample
