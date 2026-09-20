@@ -137,11 +137,12 @@ opti_model <- function(
     geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +
     ggtitle(
       sprintf(
-        "current estimate: %s = %s (%s; %s); next try: %s = %s",
+        "current estimate: %s = %s (%s; %s) [%.0f%%]; next try: %s = %s",
         opti,
         as.character(attr(new_design, "estimate")),
         as.character(attr(new_design, "range")[1]),
         as.character(attr(new_design, "range")[2]),
+        100 * diff(attr(new_design, "range")) / attr(new_design, "estimate"),
         opti,
         as.character(new_design)
       )
