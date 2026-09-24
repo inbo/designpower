@@ -48,5 +48,9 @@ no_extremes <- function(
     ggtitle(sprintf("next try: %s = %s", opti, as.character(new_design)))
   print(p)
   flush.console()
-  return(new_design)
+  return(
+    new_design |>
+      `attr<-`("estimate", NA_real_) |>
+      `attr<-`("range", c(NA_real_, NA_real_))
+  )
 }
