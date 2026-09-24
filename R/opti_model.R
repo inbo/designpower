@@ -76,23 +76,18 @@ opti_model <- function(
       lead(.data$ucl, 1, last(.data$ucl)) >= power,
       .data$n_sim < max_sample
     ) -> current_range
+  while (nrow(current_range) > 50) {
+    diff(current_range[, opti]) |>
+      min() -> current_delta
+    current_range <- current_range[current_range[, opti] %% (10 * current_delta) == 0, ]
+  }
   predict_data |>
     filter(
       .data$lower < power,
       power < .data$upper,
       .data$n_sim < max_sample
     ) |>
-    bind_rows(
-      current_range
-    ) -> candidate
-  if (nrow(candidate) >= 50) {
-    candidate |>
-      mutate(
-        subset = as.character(!!sym(opti)) |>
-          nchar()
-      ) |>
-      filter(.data$subset == min(.data$subset)) -> candidate
-  }
+    bind_rows(current_range) -> candidate
   candidate |>
     slice_sample(n = 1, weight_by = max_sample - .data$n_sim) -> new_design
   new_design <- unlist(new_design[[opti]])
