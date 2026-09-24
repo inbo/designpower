@@ -2,6 +2,7 @@
 \.Rdata
 \.Rhistory
 ^.*\.Rproj$
+^.posit$
 ^CITATION\.cff$
 ^CRAN-RELEASE$
 ^LICENSE.md$

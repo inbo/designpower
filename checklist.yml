@@ -14,7 +14,6 @@ required:
 - DESCRIPTION
 - R CMD check
 - checklist
-- codemeta
 - documentation
 - filename conventions
 - folder conventions
@@ -30,3 +29,4 @@ spelling:
   - docs
   - LICENSE.md
 pak: []
+gha_install: []

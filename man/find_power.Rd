@@ -12,7 +12,11 @@ find_power(
   extra_args = list(),
   power = 0.9,
   alpha = 0.1,
-  filename = "power.duckdb"
+  filename = "power.duckdb",
+  n_sim = 100,
+  max_sim = 1000,
+  opti_range = NULL,
+  opti_ratio = 0.2
 )
 }
 \arguments{
@@ -24,8 +28,8 @@ The names must match those in \code{design}.}
 
 \item{opti}{Character. Name of parameter to optimize.}
 
-\item{sim_power}{Function. Simulation function (should accept \code{design} and
-\code{n_sim}).}
+\item{sim_power}{Function. Simulation function (must accept \code{design}).
+Must return a single p-value.}
 
 \item{extra_args}{List. Optional additional arguments passed to \code{sim_power}.
 Defaults to an empty list.}
@@ -35,6 +39,28 @@ Defaults to an empty list.}
 \item{alpha}{Numeric. Significance level (default 0.1).}
 
 \item{filename}{Character. Path to \code{DuckDB} database file.}
+
+\item{n_sim}{Integer.
+Number of simulations to run per iteration (default 100).
+One iteration consists of running \code{n_sim} simulations at the current design
+parameter value, then updating the design parameter based on the observed
+power.}
+
+\item{max_sim}{Integer. Maximum number of simulations to consider for
+candidate selection (default 1000).}
+
+\item{opti_range}{Numeric of length 2. Optional lower and upper limit for the
+parameter given in \code{opti}.
+When specified, only values within this range are simulated and reported.
+When \code{NULL} (default), the search space is unrestricted.}
+
+\item{opti_ratio}{Numeric.
+Stop searching when ratio between the width of the optimal interval and
+the current optimal value is below this threshold (default 0.2).
+Set this to a lower value to get more precise estimates of the optimal design
+parameter.
+We recommend to start with the default value of 0.2.
+Then improve the search with a lower value if needed.}
 }
 \value{
 Numeric vector. The optimized parameter value and confidence range.
