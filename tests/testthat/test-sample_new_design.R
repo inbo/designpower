@@ -178,7 +178,9 @@ test_that("sample_new_design works with two estimates", {
       design_digits = c(trend = 3),
       opti = "trend"
     ),
-    0.025
+    0.025 |>
+      `attr<-`(which = "estimate", NA_real_) |>
+      `attr<-`(which = "range", c(NA_real_, NA_real_))
   )
   expect_type(
     new_design <- sample_new_design(
