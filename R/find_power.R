@@ -183,7 +183,7 @@ find_power <- function(
     ) -> new_design
   while (length(new_design) > 0) {
     design[[opti]] <- new_design
-    message(design[[opti]])
+    message(design[[opti]], " ", Sys.time())
     design_id <- get_design_id(
       connection = connection,
       where_clause = where_clause,
