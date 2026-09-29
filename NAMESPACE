@@ -19,6 +19,7 @@ importFrom(dplyr,
 )
 importFrom(duckdb,
   dbConnect,
+  dbDisconnect,
   dbListTables,
   dbWriteTable,
   duckdb

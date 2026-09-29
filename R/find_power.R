@@ -51,7 +51,7 @@
 #'
 #' @importFrom digest sha1
 #' @importFrom dplyr mutate
-#' @importFrom duckdb dbConnect duckdb dbWriteTable
+#' @importFrom duckdb dbConnect dbDisconnect dbWriteTable duckdb
 #' @importFrom mgcv gam
 #' @export
 find_power <- function(
@@ -128,6 +128,7 @@ find_power <- function(
     vector("list", 1)
   )
   connection <- dbConnect(duckdb(), filename)
+  on.exit(dbDisconnect(connection), add = TRUE)
 
   fixed_design <- design[!names(design) %in% opti]
   hashes <- c(
