@@ -12,7 +12,7 @@ no_extremes <- function(
   opti_range
 ) {
   current_range <- range(power_summary[, opti])
-  if (abs(no_small - min(power_summary$estimated_power)) < 1e-3) {
+  if (nrow(power_summary) < 5 ||  abs(no_small - min(power_summary$estimated_power)) < 1e-3) {
     # all estimates are either 1 or 0, so we cannot determine the direction of
     # change based on the model, so we randomly choose to increase or decrease
     # the design parameter
