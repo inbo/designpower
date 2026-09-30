@@ -1,5 +1,5 @@
 #' @importFrom dplyr across bind_rows filter first lag last lead left_join
-#' @importFrom dplyr mutate select slice_sample
+#' @importFrom dplyr mutate select slice_sample slice_max
 #' @importFrom ggplot2 aes geom_line geom_rect geom_ribbon geom_vline ggtitle
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom mgcv gam
@@ -41,10 +41,9 @@ opti_model <- function(
     x = seq(
       max(
         min(abs(power_summary[, opti])),
-        10^(-design_digits[[opti]]),
-        opti_range[1]
+        10^(-design_digits[[opti]])
       ),
-      min(max(abs(power_summary[, opti])) * 1.05, opti_range[2]),
+      max(abs(power_summary[, opti])) * 1.25,
       by = 10^(-design_digits[[opti]])
     ) *
       sign(design[[opti]])
@@ -71,15 +70,30 @@ opti_model <- function(
     ) -> predict_data
   predict_data |>
     filter(
-      lag(.data$lcl, 1, first(.data$lcl)) <= .data$lcl,
+      lag(.data$fit, 1, first(.data$fit)) <= .data$fit,
       lag(.data$lcl, 1, first(.data$lcl)) < power,
       lead(.data$ucl, 1, last(.data$ucl)) >= power,
       .data$n_sim < max_sample
     ) -> current_range
+  current_range <- current_range[
+    opti_range[1] <= abs(current_range[, opti]) &
+      abs(current_range[, opti]) <= opti_range[2],
+  ]
   while (nrow(current_range) > 50) {
     diff(current_range[, opti]) |>
       min() -> current_delta
-    current_range <- current_range[current_range[, opti] %% (10 * current_delta) == 0, ]
+    current_range <- current_range[
+      current_range[, opti] %% (10 * current_delta) == 0,
+    ]
+  }
+  if (nrow(current_range) == 0) {
+    stopifnot("all power to high" = all(predict_data$lcl < power))
+    predict_data |>
+      slice_max(.data$ucl, n = 2) |>
+      filter(.data$n_sim < max_sample) -> current_range
+    stopifnot("no new design found" = nrow(current_range) > 0)
+    message("only low power predictions available")
+    browser()
   }
   predict_data |>
     filter(
@@ -148,7 +162,10 @@ opti_model <- function(
   flush.console()
   attr(new_design, "range") |>
     diff() -> current_range
-  if (abs(current_range / attr(new_design, "estimate")) < opti_ratio) {
+  if (
+    !is.na(current_range) &&
+      abs(current_range / attr(new_design, "estimate")) < opti_ratio
+  ) {
     return(
       numeric(0) |>
         `attr<-`("estimate", attr(new_design, "estimate")) |>

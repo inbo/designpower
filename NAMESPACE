@@ -15,6 +15,7 @@ importFrom(dplyr,
   left_join,
   mutate,
   select,
+  slice_max,
   slice_sample
 )
 importFrom(duckdb,
