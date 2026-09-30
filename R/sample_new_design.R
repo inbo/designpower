@@ -72,8 +72,8 @@ sample_new_design <- function(
   # check if we have both low and high power estimates
   # if not expand the search space by doubling the largest or halving the
   # smallest design parameter value
-  no_small <- 0.5 < min(power_summary$ucl)
-  no_large <- max(power_summary$lcl) < power
+  no_small <- 0.5 < min(power_summary$estimated_power)
+  no_large <- max(power_summary$estimated) < power
   situation <- ifelse(
     no_small || no_large,
     "no_extremes",
