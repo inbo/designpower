@@ -87,7 +87,9 @@ sample_new_design <- function(
       opti = opti,
       design = design,
       design_digits = design_digits,
-      opti_range = opti_range
+      opti_range = opti_range,
+      power = power,
+      max_sample = max_sample
     ),
     "midpoint" = midpoint(
       p = p,
