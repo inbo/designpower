@@ -40,31 +40,15 @@ no_extremes <- function(
   ifelse(decrease, current_min / 2, current_max * 2) |>
     round(digits = design_digits[opti]) |>
     max(10^-design_digits[opti]) -> new_design
-  new_design * sign(design[[opti]]) -> new_design
-  if (!is.null(opti_range)) {
-    new_design |>
-      min(max(opti_range)) |>
-      max(min(opti_range)) -> new_design
-    existing <- which(power_summary[, opti] == new_design)
-    if (
-      length(existing) &&
-        (
-          power_summary[existing, "n_sim"] >= max_sample ||
-            power_summary[existing, "lcl"] > power ||
-            power_summary[existing, "ucl"] < power # fmt: skip
-        )
-    ) {
-      if (
-        abs(new_design) == abs(min(opti_range)) &&
-          max(abs(power_summary[, opti])) < max(abs(opti_range))
-      ) {
-        new_design <- sign(design[[opti]]) *
-          min(2 * max(abs(power_summary[, opti])), max(abs(opti_range)))
-      } else {
-        new_design <- integer(0)
-      }
-    }
-  }
+  new_design <- opti_range_extremes(
+    new_design = new_design * sign(design[[opti]]),
+    opti_range = opti_range,
+    power_summary = power_summary,
+    opti = opti,
+    max_sample = max_sample,
+    design = design,
+    power = power
+  )
   # add vertical line with the estimate to plot and print
   p <- p +
     geom_vline(xintercept = new_design, colour = "blue", linewidth = 1) +
