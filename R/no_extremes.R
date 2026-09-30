@@ -48,9 +48,11 @@ no_extremes <- function(
     existing <- which(power_summary[, opti] == new_design)
     if (
       length(existing) &&
-        (power_summary[existing, "n_sim"] >= max_sample ||
-          power_summary[existing, "lcl"] > power ||
-          power_summary[existing, "ucl"] < power)
+        (
+          power_summary[existing, "n_sim"] >= max_sample ||
+            power_summary[existing, "lcl"] > power ||
+            power_summary[existing, "ucl"] < power # fmt: skip
+        )
     ) {
       if (
         abs(new_design) == abs(min(opti_range)) &&
