@@ -6,7 +6,6 @@
 \usage{
 sim_power(
   design = list(trend = -0.03, n_year = 12, n_sample = 20),
-  n_sim = 100,
   intercept = 2,
   sigma_error = 0.1
 )
@@ -18,8 +17,6 @@ sim_power(
 \item \code{n_year}: Number of years
 \item \code{n_sample}: Number of samples per year
 }}
-
-\item{n_sim}{Integer. Number of simulations.}
 
 \item{intercept}{Numeric. Intercept of the model.}
 
@@ -41,8 +38,7 @@ Simulates data under a simple model and returns p-values.
 \examples{
 \dontrun{
 sim_power(
-  design = list(trend = -0.03, n_year = 12, n_sample = 20),
-  n_sim = 10
+  design = list(trend = -0.03, n_year = 12, n_sample = 20)
 )
 }
 
