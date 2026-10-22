@@ -37,7 +37,7 @@ INNER JOIN design AS d ON p.design_id = d.id
 WHERE %3$s
 GROUP BY %1$s
 ORDER BY %1$s" |>
-    sprintf(opti_clause, alpha / 2, where_clause) |>
+    sprintf(opti_clause, alpha, where_clause) |>
     dbGetQuery(conn = connection) |>
     mutate(
       non_signif = .data$n_sim - .data$signif,
